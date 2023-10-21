@@ -147,8 +147,8 @@ encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=Tracestate}) ->
 
 
 -spec encode_parent(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_parent(#span_ctx{span_id = undefined}) -> "";
-encode_parent(#span_ctx{span_id = SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
+encode_parent(#span_ctx{span_id=0}) -> "";
+encode_parent(#span_ctx{span_id=SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
 
 -spec encode_sampled(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
 encode_sampled(#span_ctx{trace_flags = TraceFlags}) ->
