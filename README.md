@@ -3,8 +3,19 @@
 
 # otel_propagator_xray
 
+An implementation of {@link otel_propagator_text_map} that injects and
+extracts trace context from AWS X-Ray.
 
-An OTP library
+https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
+
+Since `trace_context' and `baggage' are the two default propagators the
+global TextMap Propagators must be configured.
+
+## Configuration
+
+```erlang
+{text_map_propagators, [xray, baggage]},
+```
 
 ## Contributing
 
