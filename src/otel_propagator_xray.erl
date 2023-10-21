@@ -101,12 +101,12 @@ decode(Value, SpanCtx) ->
 
 
 -spec set_tracestate(opentelemetry:span_ctx(), binary()) -> opentelemetry:span_ctx().
-set_tracestate(#span_ctx{tracestate = undefined} = SpanCtx, Value) ->
-  SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value}]};
+set_tracestate(#span_ctx{tracestate=[]} = SpanCtx, Value) ->
+  SpanCtx#span_ctx{tracestate=[{<<"xray">>, Value}]};
 
-set_tracestate(#span_ctx{tracestate = Tracestate} = SpanCtx, Value) ->
+set_tracestate(#span_ctx{tracestate=Tracestate} = SpanCtx, Value) ->
   % Add new trace id to front of tracestate, removing any existing value
-  SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value} | lists:keydelete(<<"xray">>, 1, Tracestate)]}.
+  SpanCtx#span_ctx{tracestate=[{<<"xray">>, Value} | lists:keydelete(<<"xray">>, 1, Tracestate)]}.
 
 %% Trace ID is a 24-byte hex binary
 
@@ -136,10 +136,10 @@ encode(SpanCtx) ->
 
 
 -spec encode_trace_id(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_trace_id(#span_ctx{trace_id = TraceId, tracestate = undefined}) ->
+encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=[]}) ->
   generate_trace_id(TraceId);
 
-encode_trace_id(#span_ctx{trace_id = TraceId, tracestate = Tracestate}) ->
+encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=Tracestate}) ->
   case lists:keyfind(<<"xray">>, 1, Tracestate) of
     false -> generate_trace_id(TraceId);
     {_, Value} -> Value
