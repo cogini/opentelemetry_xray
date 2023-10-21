@@ -1,0 +1,47 @@
+---
+name: Test
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        otp: ['24.3', '25.2', '26.1.2']
+    steps:
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Check out source
+        uses: actions/checkout@v3
+
+      - name: Install Erlang and Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          rebar3-version: '3.18.0'
+
+      - name: Retrieve cached deps
+        uses: actions/cache@v3
+        with:
+          path: |
+            _build
+          key: ${{ matrix.otp }}-${{ hashFiles('**/rebar.lock') }}
+          restore-keys: |
+            ${{ matrix.otp }}-
+
+      - name: Check formatting
+        run: rebar3 steamroll --check
+
+      - name: Run Erlang tests
+        run: rebar3 ct
+
+      - name: Run static code analysis checks
+        run: rebar3 dialyzer
