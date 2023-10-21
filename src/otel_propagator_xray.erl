@@ -71,8 +71,7 @@ extract(Ctx, Carrier, _CarrierKeysFun, CarrierGet, _Options) ->
 parse_xray_context(Carrier, CarrierGet) ->
   case CarrierGet(?XRAY_CONTEXT_KEY, Carrier) of
     Context when is_binary(Context) ->
-      % Set defaults like in otel_tracer:from_remote_span/3
-      SpanCtx = #span_ctx{is_valid = true, is_recording = false, is_remote = true},
+      SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
       lists:foldl(fun decode/2, SpanCtx, string:split(Context, ";", all));
 
     _ -> throw(invalid)
