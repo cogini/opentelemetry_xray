@@ -2,13 +2,13 @@
   application,
   otel_propagator_xray,
   [
-    {description, "An OTP library"},
+    {description, "OpenTelemetry propagator for AWS X-Ray"},
     {vsn, "0.1.0"},
     {registered, []},
-    {applications, [kernel, stdlib]},
+    {applications, [kernel, stdlib, opentelemetry_api]},
     {env, []},
     {modules, []},
     {licenses, ["Apache-2.0"]},
-    {links, []}
+    {links, [{"GitHub", "https://github.com/cogini/opentelemetry_propagator_xray"}]}
   ]
 }.
