@@ -53,6 +53,7 @@ inject(Ctx, Carrier, CarrierSet, _Options) ->
     _ -> Carrier
   end.
 
+
 % @doc Extract context from carrier.
 -spec extract(Context, Carrier, CarrierKeysFun, CarrierGetFun, Options) ->
   Context
@@ -81,6 +82,7 @@ parse_context(Carrier, CarrierGet) ->
     _ -> throw(invalid)
   end.
 
+
 % @doc Decode context into span_ctx.
 % Examples:
 % * X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8;Sampled=0
@@ -88,48 +90,48 @@ parse_context(Carrier, CarrierGet) ->
 % @end
 -spec decode(binary()) -> opentelemetry:span_ctx().
 decode(Context) ->
-    % Initialize span context, setting tracing off by default
-    SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
-    lists:foldl(fun decode/2, SpanCtx, string:split(Context, ";", all)).
+  % Initialize span context, setting tracing off by default
+  SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
+  lists:foldl(fun decode/2, SpanCtx, string:split(Context, ";", all)).
+
 
 -spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx().
 decode(<<"Root=1-", Time:8/binary, "-", UniqueId:24/binary>>, SpanCtx) ->
-    % Save original trace ID in tracestate
-    % SpanCtx = set_tracestate(SpanCtx0, <<"1-", Time/binary, "-", UniqueId/binary>>),
-    % Parse Id and use it as trace_id
-    SpanCtx#span_ctx{trace_id = parse_trace_id(Time, UniqueId)};
+  % Save original trace ID in tracestate
+  % SpanCtx = set_tracestate(SpanCtx0, <<"1-", Time/binary, "-", UniqueId/binary>>),
+  % Parse Id and use it as trace_id
+  SpanCtx#span_ctx{trace_id = parse_trace_id(Time, UniqueId)};
 
-decode(<<"Root=", _rest/binary>>, _SpanCtx) ->
-    throw(invalid);
+decode(<<"Root=", _rest/binary>>, _SpanCtx) -> throw(invalid);
 
 decode(<<"Parent=", ParentId:16/binary>>, SpanCtx) ->
   SpanCtx#span_ctx{span_id = parse_span_id(ParentId)};
 
-decode(<<"Parent=", _rest/binary>>, _SpanCtx) ->
-    throw(invalid);
-
+decode(<<"Parent=", _rest/binary>>, _SpanCtx) -> throw(invalid);
 decode(<<"Sampled=0">>, SpanCtx) -> SpanCtx#span_ctx{trace_flags = 0};
 decode(<<"Sampled=1">>, SpanCtx) -> SpanCtx#span_ctx{trace_flags = 1};
-decode(<<"Sampled=", _rest/binary>>, _SpanCtx) ->
-    throw(invalid);
+decode(<<"Sampled=", _rest/binary>>, _SpanCtx) -> throw(invalid);
 
 decode(_Value, SpanCtx) ->
-    % Ignore things that we don't understand, e.g. Lineage
-    SpanCtx.
+  % Ignore things that we don't understand, e.g. Lineage
+  SpanCtx.
+
 
 % @doc Parse trace_id to integer.
 % Combines time and unique id into a single big integer, following other AWS SDKs:
 % * https://github.com/open-telemetry/opentelemetry-python-contrib/blob/main/propagator/opentelemetry-propagator-aws-xray/src/opentelemetry/propagators/aws/aws_xray_propagator.py
 % * https://github.com/open-telemetry/opentelemetry-go-contrib/blob/main/propagators/aws/xray/propagator.go
--spec parse_trace_id(Time, UniqueId) -> non_neg_integer() when Time :: binary(),
-                                                              UniqueId :: binary().
+-spec parse_trace_id(Time, UniqueId) ->
+  non_neg_integer() when Time :: binary(), UniqueId :: binary().
 parse_trace_id(Time, UniqueId) when is_binary(UniqueId) ->
-    case string:length(Time) =:= 8 andalso string:length(UniqueId) =:= 24 of
-        true ->
-            TraceId = iolist_to_binary([Time, UniqueId]),
-            string_to_integer(TraceId, 16);
-        _ -> throw(invalid)
-    end.
+  case string:length(Time) =:= 8 andalso string:length(UniqueId) =:= 24 of
+    true ->
+      TraceId = iolist_to_binary([Time, UniqueId]),
+      string_to_integer(TraceId, 16);
+
+    _ -> throw(invalid)
+  end.
+
 
 % @doc Parse span id to integer.
 parse_span_id(SpanId) when is_binary(SpanId) ->
@@ -143,12 +145,9 @@ parse_span_id(SpanId) when is_binary(SpanId) ->
 % -spec set_tracestate(opentelemetry:span_ctx(), binary()) -> opentelemetry:span_ctx().
 % set_tracestate(#span_ctx{tracestate = []} = SpanCtx, Value) ->
 %   SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value}]};
-
 % set_tracestate(#span_ctx{tracestate = Tracestate} = SpanCtx, Value) ->
 %   % Add new trace id to front of tracestate, removing any existing value
 %   SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value} | lists:keydelete(<<"xray">>, 1, Tracestate)]}.
-
-
 % @doc Encode span context.
 -spec encode(opentelemetry:span_ctx()) -> unicode:unicode_binary().
 encode(SpanCtx) ->
@@ -159,37 +158,35 @@ encode(SpanCtx) ->
 
 
 -spec encode_trace_id(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_trace_id(#span_ctx{trace_id=TraceId}) ->
+encode_trace_id(#span_ctx{trace_id = TraceId}) ->
   TraceIdHex = unicode:characters_to_binary(io_lib:format("~32.16.0b", [TraceId])),
   <<Time:8/binary, UniqueId:24/binary>> = TraceIdHex,
   [Time, "-", UniqueId].
 
-% encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=[]}) -> generate_trace_id(TraceId);
 
+% encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=[]}) -> generate_trace_id(TraceId);
 % encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=Tracestate}) ->
 %   case lists:keyfind(<<"xray">>, 1, Tracestate) of
 %     false -> generate_trace_id(TraceId);
 %     {_, Value} -> Value
 %   end.
-
-
 -spec encode_parent(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_parent(#span_ctx{span_id=0}) -> "";
-encode_parent(#span_ctx{span_id=SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
+encode_parent(#span_ctx{span_id = 0}) -> "";
+encode_parent(#span_ctx{span_id = SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
 
 -spec encode_sampled(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_sampled(#span_ctx{trace_flags=TraceFlags}) ->
+encode_sampled(#span_ctx{trace_flags = TraceFlags}) ->
   % Sampling is the default
   case TraceFlags band 1 of
     0 -> <<";Sampled=0">>;
     _ -> <<>>
   end.
 
+
 % -spec generate_trace_id(opentelemetry:trace_id()) -> unicode:latin1_chardata().
 % generate_trace_id(TraceId) ->
 %   Timestamp = opentelemetry:convert_timestamp(opentelemetry:timestamp(), second),
 %   ["1-", io_lib:format("~8.16.0b", [Timestamp]), io_lib:format("~24.16.0b", [TraceId])].
-
 string_to_integer(S, Base) when is_binary(S) -> binary_to_integer(S, Base).
 
 %% @doc Encode span context tracestate.
