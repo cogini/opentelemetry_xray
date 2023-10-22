@@ -13,7 +13,9 @@
 -export([fields/1, inject/4, extract/5]).
 
 -ifdef(TEST).
+
 -export([decode/2, parse_trace_id/1]).
+
 -endif.
 
 -include_lib("kernel/include/logger.hrl").
@@ -78,6 +80,7 @@ parse_xray_context(Carrier, CarrierGet) ->
 %% @doc Decode X-Amzn-Trace-Id header into span_ctx.
 %%
 %% X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8;Sampled=0
+
 -spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx().
 decode(<<"Root=1-", Time:8/binary, "-", Id:24/binary>>, SpanCtx0) ->
   % Save original trace ID in tracestate
@@ -98,12 +101,12 @@ decode(Value, SpanCtx) ->
 
 
 -spec set_tracestate(opentelemetry:span_ctx(), binary()) -> opentelemetry:span_ctx().
-set_tracestate(#span_ctx{tracestate=[]} = SpanCtx, Value) ->
-  SpanCtx#span_ctx{tracestate=[{<<"xray">>, Value}]};
+set_tracestate(#span_ctx{tracestate = []} = SpanCtx, Value) ->
+  SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value}]};
 
-set_tracestate(#span_ctx{tracestate=Tracestate} = SpanCtx, Value) ->
+set_tracestate(#span_ctx{tracestate = Tracestate} = SpanCtx, Value) ->
   % Add new trace id to front of tracestate, removing any existing value
-  SpanCtx#span_ctx{tracestate=[{<<"xray">>, Value} | lists:keydelete(<<"xray">>, 1, Tracestate)]}.
+  SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value} | lists:keydelete(<<"xray">>, 1, Tracestate)]}.
 
 %% Trace ID is a 24-byte hex binary
 
@@ -133,10 +136,9 @@ encode(SpanCtx) ->
 
 
 -spec encode_trace_id(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=[]}) ->
-  generate_trace_id(TraceId);
+encode_trace_id(#span_ctx{trace_id = TraceId, tracestate = []}) -> generate_trace_id(TraceId);
 
-encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=Tracestate}) ->
+encode_trace_id(#span_ctx{trace_id = TraceId, tracestate = Tracestate}) ->
   case lists:keyfind(<<"xray">>, 1, Tracestate) of
     false -> generate_trace_id(TraceId);
     {_, Value} -> Value
@@ -144,8 +146,8 @@ encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=Tracestate}) ->
 
 
 -spec encode_parent(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
-encode_parent(#span_ctx{span_id=0}) -> "";
-encode_parent(#span_ctx{span_id=SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
+encode_parent(#span_ctx{span_id = 0}) -> "";
+encode_parent(#span_ctx{span_id = SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
 
 -spec encode_sampled(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
 encode_sampled(#span_ctx{trace_flags = TraceFlags}) ->
