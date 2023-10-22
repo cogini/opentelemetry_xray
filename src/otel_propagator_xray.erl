@@ -97,8 +97,9 @@ decode(Context) ->
 
 -spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx().
 decode(<<"Root=1-", Time:8/binary, "-", UniqueId:24/binary>>, SpanCtx) ->
-  % Save original trace ID in tracestate
-  % SpanCtx = set_tracestate(SpanCtx0, <<"1-", Time/binary, "-", UniqueId/binary>>),
+  % Save trace ID in tracestate
+  % TraceId = <<"1-", Time/binary, "-", UniqueId/binary>>,
+  % Tracestate = otel_tracestate:update(<<"xray">>, TraceId, SpanCtx#span_ctx.tracestate),
   % Parse Id and use it as trace_id
   SpanCtx#span_ctx{trace_id = parse_trace_id(Time, UniqueId)};
 
@@ -141,13 +142,11 @@ parse_span_id(SpanId) when is_binary(SpanId) ->
   end.
 
 
-% This is incorrect, it should use the functions to manipulate state
-% -spec set_tracestate(opentelemetry:span_ctx(), binary()) -> opentelemetry:span_ctx().
-% set_tracestate(#span_ctx{tracestate = []} = SpanCtx, Value) ->
-%   SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value}]};
-% set_tracestate(#span_ctx{tracestate = Tracestate} = SpanCtx, Value) ->
-%   % Add new trace id to front of tracestate, removing any existing value
-%   SpanCtx#span_ctx{tracestate = [{<<"xray">>, Value} | lists:keydelete(<<"xray">>, 1, Tracestate)]}.
+-spec set_tracestate(opentelemetry:span_ctx(), binary()) -> opentelemetry:span_ctx().
+set_tracestate(Value, #span_ctx{tracestate = Tracestate} = SpanCtx) ->
+  NewTracestate = otel_tracestate:update(<<"xray">>, Value, Tracestate),
+  SpanCtx#span_ctx{tracestate = NewTracestate}.
+
 % @doc Encode span context.
 -spec encode(opentelemetry:span_ctx()) -> unicode:unicode_binary().
 encode(SpanCtx) ->
