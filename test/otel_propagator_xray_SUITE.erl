@@ -13,7 +13,7 @@ parse() -> [{docs, "low level parsing"}].
 
 parse(_) ->
   ?assertEqual(
-    otel_propagator_xray:string_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
+    binary_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
     otel_propagator_xray:parse_trace_id(<<"5759e988">>, <<"bd862e3fe1be46a994272793">>)
   ),
   ok.
@@ -23,8 +23,8 @@ decode() -> [{docs, "decode header"}].
 
 decode(_) ->
   SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
-  TraceId = otel_propagator_xray:string_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
-  SpanId = otel_propagator_xray:string_to_integer(<<"53995c3f42cd8ad8">>, 16),
+  TraceId = binary_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
+  SpanId = binary_to_integer(<<"53995c3f42cd8ad8">>, 16),
   ?assertEqual(
     SpanCtx#span_ctx{trace_id = TraceId},
     otel_propagator_xray:decode(<<"Root=1-5759e988-bd862e3fe1be46a994272793">>, SpanCtx)
@@ -65,7 +65,7 @@ decode(_) ->
 encode() -> [{docs, "encode header"}].
 
 encode(_) ->
-  TraceId = otel_propagator_xray:string_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
+  TraceId = binary_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
   SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
   ?assertEqual(
     <<"Root=1-5759e988-bd862e3fe1be46a994272793;Sampled=1">>,

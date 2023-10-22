@@ -24,7 +24,7 @@
 
 -ifdef(TEST).
 
--export([decode/1, decode/2, parse_trace_id/2, string_to_integer/2, encode/1]).
+-export([decode/1, decode/2, parse_trace_id/2, encode/1]).
 
 -endif.
 
@@ -32,8 +32,6 @@
 -include_lib("opentelemetry_api/include/opentelemetry.hrl").
 
 -define(XRAY_CONTEXT_KEY, <<"X-Amzn-Trace-Id">>).
--define(XRAY_TRACESTATE_KEY, <<"xray">>).
--define(STATE_HEADER_KEY, <<"tracestate">>).
 
 % @doc Return list of the keys the propagator sets with `inject'.
 fields(_) -> [?XRAY_CONTEXT_KEY].
@@ -97,10 +95,6 @@ decode(Context) ->
 
 -spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx().
 decode(<<"Root=1-", Time:8/binary, "-", UniqueId:24/binary>>, SpanCtx) ->
-  % Save trace ID in tracestate
-  % TraceId = <<"1-", Time/binary, "-", UniqueId/binary>>,
-  % Tracestate = otel_tracestate:update(<<"xray">>, TraceId, SpanCtx#span_ctx.tracestate),
-  % Parse Id and use it as trace_id
   SpanCtx#span_ctx{trace_id = parse_trace_id(Time, UniqueId)};
 
 decode(<<"Root=", _rest/binary>>, _SpanCtx) -> throw(invalid);
@@ -128,7 +122,7 @@ parse_trace_id(Time, UniqueId) when is_binary(UniqueId) ->
   case string:length(Time) =:= 8 andalso string:length(UniqueId) =:= 24 of
     true ->
       TraceId = iolist_to_binary([Time, UniqueId]),
-      string_to_integer(TraceId, 16);
+      binary_to_integer(TraceId, 16);
 
     _ -> throw(invalid)
   end.
@@ -137,15 +131,10 @@ parse_trace_id(Time, UniqueId) when is_binary(UniqueId) ->
 % @doc Parse span id to integer.
 parse_span_id(SpanId) when is_binary(SpanId) ->
   case string:length(SpanId) =:= 16 of
-    true -> string_to_integer(SpanId, 16);
+    true -> binary_to_integer(SpanId, 16);
     _ -> throw(invalid)
   end.
 
-
--spec set_tracestate(opentelemetry:span_ctx(), binary()) -> opentelemetry:span_ctx().
-set_tracestate(Value, #span_ctx{tracestate = Tracestate} = SpanCtx) ->
-  NewTracestate = otel_tracestate:update(<<"xray">>, Value, Tracestate),
-  SpanCtx#span_ctx{tracestate = NewTracestate}.
 
 % @doc Encode span context.
 -spec encode(opentelemetry:span_ctx()) -> unicode:unicode_binary().
@@ -163,12 +152,6 @@ encode_trace_id(#span_ctx{trace_id = TraceId}) ->
   [Time, "-", UniqueId].
 
 
-% encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=[]}) -> generate_trace_id(TraceId);
-% encode_trace_id(#span_ctx{trace_id=TraceId, tracestate=Tracestate}) ->
-%   case lists:keyfind(<<"xray">>, 1, Tracestate) of
-%     false -> generate_trace_id(TraceId);
-%     {_, Value} -> Value
-%   end.
 -spec encode_parent(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
 encode_parent(#span_ctx{span_id = 0}) -> "";
 encode_parent(#span_ctx{span_id = SpanId}) -> io_lib:format(";Parent=~16.16.0b", [SpanId]).
@@ -180,20 +163,3 @@ encode_sampled(#span_ctx{trace_flags = TraceFlags}) ->
     1 -> <<";Sampled=1">>;
     _ -> <<>>
   end.
-
-
-% -spec generate_trace_id(opentelemetry:trace_id()) -> unicode:latin1_chardata().
-% generate_trace_id(TraceId) ->
-%   Timestamp = opentelemetry:convert_timestamp(opentelemetry:timestamp(), second),
-%   ["1-", io_lib:format("~8.16.0b", [Timestamp]), io_lib:format("~24.16.0b", [TraceId])].
-string_to_integer(S, Base) when is_binary(S) -> binary_to_integer(S, Base).
-
-%% @doc Encode span context tracestate.
-%% https://www.w3.org/TR/trace-context/#tracestate-header
-
-% -spec encode_tracestate(opentelemetry:span_ctx()) -> [{unicode:latin1_binary(), unicode:latin1_binary()}].
-% encode_tracestate(#span_ctx{tracestate=undefined}) ->
-%     [];
-% encode_tracestate(#span_ctx{tracestate=Entries}) ->
-%     HeaderValue = lists:join($,, [[Key, $=, Value] || {Key, Value} <- Entries]),
-%     [{<<"tracestate">>, otel_utils:assert_to_binary(HeaderValue)}].
