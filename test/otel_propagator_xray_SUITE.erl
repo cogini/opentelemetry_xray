@@ -65,7 +65,6 @@ decode(_) ->
 decode_invalid() -> [{docs, "decode invalid"}].
 
 decode_invalid(_) ->
-  SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
   % invalid trace id
   ?assertError(
     badarg,
