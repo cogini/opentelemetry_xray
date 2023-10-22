@@ -20,19 +20,22 @@
 
 % Don't implement behavior to avoid dependency on opentelemetry
 % -behaviour(otel_id_generator).
-
 -export([generate_trace_id/0, generate_span_id/0]).
 
 -include_lib("opentelemetry_api/include/gradualizer.hrl").
 
 %% @doc Generates a 128 bit random integer to use as a trace id.
+
 -spec generate_trace_id() -> opentelemetry:trace_id().
 generate_trace_id() ->
-    Timestamp = opentelemetry:convert_timestamp(opentelemetry:timestamp(), second),
-    UniqueId = rand:uniform(?assert_type(2 bsl 95 - 1, pos_integer())), %% 2 shifted left by 95 == 2 ^ 96
-    Timestamp bsl 96 band UniqueId.
+  Timestamp = opentelemetry:convert_timestamp(opentelemetry:timestamp(), second),
+  %% 2 shifted left by 95 == 2 ^ 96
+  UniqueId = rand:uniform(?assert_type(2 bsl 95 - 1, pos_integer())),
+  Timestamp bsl 96 band UniqueId.
 
 %% @doc Generates a 64 bit random integer to use as a span id.
+
 -spec generate_span_id() -> opentelemetry:span_id().
-generate_span_id() ->
-    rand:uniform(?assert_type(2 bsl 63 - 1, pos_integer())). %% 2 shifted left by 63 == 2 ^ 64
+generate_span_id() -> rand:uniform(?assert_type(2 bsl 63 - 1, pos_integer())).
+
+%% 2 shifted left by 63 == 2 ^ 64
