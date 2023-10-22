@@ -24,7 +24,7 @@
 
 -ifdef(TEST).
 
--export([decode/1, decode/2, parse_trace_id/2, string_to_integer/2]).
+-export([decode/1, decode/2, parse_trace_id/2, string_to_integer/2, encode/1]).
 
 -endif.
 
@@ -176,9 +176,9 @@ encode_parent(#span_ctx{span_id = SpanId}) -> io_lib:format(";Parent=~16.16.0b",
 
 -spec encode_sampled(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
 encode_sampled(#span_ctx{trace_flags = TraceFlags}) ->
-  % Sampling is the default
+  % No sampling is the default
   case TraceFlags band 1 of
-    0 -> <<";Sampled=0">>;
+    1 -> <<";Sampled=1">>;
     _ -> <<>>
   end.
 
