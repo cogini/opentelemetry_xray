@@ -66,7 +66,6 @@ encode() -> [{docs, "encode header"}].
 
 encode(_) ->
   TraceId = otel_propagator_xray:string_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
-  SpanId = otel_propagator_xray:string_to_integer(<<"53995c3f42cd8ad8">>, 16),
   SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
   ?assertEqual(
     <<"Root=1-5759e988-bd862e3fe1be46a994272793;Sampled=1">>,
