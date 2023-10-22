@@ -1,7 +1,17 @@
 %% @doc
 %%
-%% An implementation of {@link otel_propagator_text_map} that injects and
-%% extracts trace context from AWS X-Ray.
+%% Propagator that injects and extracts context from the AWS X-Ray tracing header.
+%%
+%% When the current app is downstream from another app or the AWS load balancer,
+%% the upstream app creates the trace for the current request and sends it in
+%% the "X-Amzn-Trace-Id" HTTP header. The header includes the trace id
+%% and optional information about the parent span and sampling.
+%%
+%% Similarly, when the current app makes calls to downstream services, it sets
+%% the header to pass the current trace context.
+%%
+%% NOTE: Amazon assumes that spans are not sampled by default.
+%% If you want your traces to be sampled, make sure that you turn it on.
 %%
 %% https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
 %% @end
@@ -25,12 +35,10 @@
 -define(XRAY_TRACESTATE_KEY, <<"xray">>).
 -define(STATE_HEADER_KEY, <<"tracestate">>).
 
-%% @doc Return list of the keys the propagator sets with `inject'.
-
+% @doc Return list of the keys the propagator sets with `inject'.
 fields(_) -> [?XRAY_CONTEXT_KEY].
 
-%% @doc Inject header into carrier.
-
+% @doc Inject context into carrier.
 -spec inject(Context, Carrier, CarrierSetFun, Options) ->
   Carrier
   when Context :: otel_ctx:t(),
@@ -45,8 +53,7 @@ inject(Ctx, Carrier, CarrierSet, _Options) ->
     _ -> Carrier
   end.
 
-%% @doc Extract context from carrier.
-
+% @doc Extract context from carrier.
 -spec extract(Context, Carrier, CarrierKeysFun, CarrierGetFun, Options) ->
   Context
   when Context :: otel_ctx:t(),
@@ -77,9 +84,11 @@ parse_xray_context(Carrier, CarrierGet) ->
     _ -> throw(invalid)
   end.
 
-%% @doc Decode X-Amzn-Trace-Id header into span_ctx.
-%%
-%% X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8;Sampled=0
+% @doc Decode context into span_ctx.
+% Examples:
+% * X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8;Sampled=0
+% * X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Sampled=1;Lineage=a87bd80c:1|68fd508a:5|c512fbe3:2
+% @end
 
 -spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx().
 decode(<<"Root=1-", Time:8/binary, "-", Id:24/binary>>, SpanCtx0) ->
