@@ -7,7 +7,7 @@
 -include_lib("opentelemetry_api/include/opentelemetry.hrl").
 
 % all() -> [decode, encode, fields].
-all() -> [fields, parse, decode, encode].
+all() -> [fields, parse, decode, decode_invalid, encode].
 
 parse() -> [{docs, "low level parsing"}].
 
@@ -61,6 +61,60 @@ decode(_) ->
   ),
   ok.
 
+decode_invalid() -> [{docs, "decode invalid"}].
+
+decode_invalid(_) ->
+  SpanCtx = otel_tracer:from_remote_span(0, 0, 0),
+  % invalid trace id
+  ?assertError(
+    badarg,
+    otel_propagator_xray:decode(
+      <<"Root=1-12345678-abcdefghijklmnopqrstuvwx;Parent=53995c3f42cd8ad8;Sampled=0">>
+    )
+  ),
+  % invalid size trace id
+  ?assertThrow(
+    invalid,
+    otel_propagator_xray:decode(
+      <<"Root=1-8a3c60f7-d188f8fa79d48a391a778fa600;Parent=53995c3f42cd8ad8;Sampled=0">>
+    )
+  ),
+  % invalid span id
+  ?assertError(
+    badarg,
+    otel_propagator_xray:decode(
+      <<"Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=abcdefghijklmnop;Sampled=0">>
+    )
+  ),
+  % invalid size span id
+  ?assertThrow(
+    invalid,
+    otel_propagator_xray:decode(
+      <<"Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad800;Sampled=0">>
+    )
+  ),
+  % no sampled flag
+  ?assertThrow(
+    invalid,
+    otel_propagator_xray:decode(
+      <<"Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=">>
+    )
+  ),
+  % invalid size sampled
+  ?assertThrow(
+    invalid,
+    otel_propagator_xray:decode(
+      <<"Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=011">>
+    )
+  ),
+  % non numeric sampled flag
+  ?assertThrow(
+    invalid,
+    otel_propagator_xray:decode(
+      <<"Root=1-8a3c60f7-d188f8fa79d48a391a778fa6;Parent=53995c3f42cd8ad8;Sampled=a">>
+    )
+  ),
+  ok.
 
 encode() -> [{docs, "encode header"}].
 
