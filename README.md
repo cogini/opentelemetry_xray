@@ -13,7 +13,7 @@ Links:
 * https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
 * https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
 
-Since `trace_context` and `baggage` are the two default propagators the
+Since `trace_context` and `baggage` are the two default propagators, the
 global TextMap Propagators must be configured.
 
 ## Configuration
