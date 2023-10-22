@@ -13,9 +13,7 @@
 -export([fields/1, inject/4, extract/5]).
 
 -ifdef(TEST).
-
--include_lib("eunit/include/eunit.hrl").
-
+-export([decode/2, parse_trace_id/1]).
 -endif.
 
 -include_lib("kernel/include/logger.hrl").
@@ -80,8 +78,7 @@ parse_xray_context(Carrier, CarrierGet) ->
 %% @doc Decode X-Amzn-Trace-Id header into span_ctx.
 %%
 %% X-Amzn-Trace-Id: Root=1-5759e988-bd862e3fe1be46a994272793;Parent=53995c3f42cd8ad8;Sampled=0
-
--spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx() | undefined.
+-spec decode(binary(), opentelemetry:span_ctx()) -> opentelemetry:span_ctx().
 decode(<<"Root=1-", Time:8/binary, "-", Id:24/binary>>, SpanCtx0) ->
   % Save original trace ID in tracestate
   SpanCtx = set_tracestate(SpanCtx0, <<"1-", Time/binary, "-", Id/binary>>),
