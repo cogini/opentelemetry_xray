@@ -3,17 +3,15 @@
 
 # opentelemetry_xray
 
-OpenTelemetry [AWS X-Ray](https://aws.amazon.com/xray/) support for Erlang/Elixir.
+[OpenTelemetry](https://opentelemetry.io/) [AWS X-Ray](https://aws.amazon.com/xray/) support for Erlang/Elixir.
 
 This library includes two modules:
 
 * A propagator that reads and writes AWS X-Ray trace context headers.
-
-It implements the `otel_propagator_text_map` protocol in the Erlang SDK.
+  It implements the `otel_propagator_text_map` protocol in the Erlang SDK.
 
 * An id generator that creates X-Ray-compatible trace_id and span_id.
-
-It implements the `otel_id_generator` protocol in the Erlang SDK.
+  It implements the `otel_id_generator` protocol in the Erlang SDK.
 
 Links:
 
