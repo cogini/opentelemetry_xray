@@ -16,7 +16,7 @@
 %% https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
 %% @end
 
--module(otel_xray_propagator).
+-module(opentelemetry_xray_propagator).
 
 -behaviour(otel_propagator_text_map).
 

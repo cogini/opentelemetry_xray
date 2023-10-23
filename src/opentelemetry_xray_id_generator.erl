@@ -16,7 +16,7 @@
 %% https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
 %% @end
 
--module(otel_xray_id_generator).
+-module(opentelemetry_xray_id_generator).
 
 % Don't implement behavior to avoid dependency on opentelemetry
 % -behaviour(otel_id_generator).

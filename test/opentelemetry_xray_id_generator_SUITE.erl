@@ -1,4 +1,4 @@
--module(otel_xray_id_generator_SUITE).
+-module(opentelemetry_xray_id_generator_SUITE).
 
 -compile(export_all).
 
@@ -16,6 +16,6 @@ merge(_) ->
   UniqueId = 51635583967283991042469687690,
   ?assertEqual(
     ((1698024497 bsl 96) bor 51635583967283991042469687690),
-    otel_xray_id_generator:merge_trace_id(Timestamp, UniqueId)
+    opentelemetry_xray_id_generator:merge_trace_id(Timestamp, UniqueId)
   ),
   ok.
