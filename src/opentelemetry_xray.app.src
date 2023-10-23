@@ -1,12 +1,6 @@
 {
   application,
-<<<<<<<< HEAD:src/otel_xray.app.src
-  otel_xray,
-|||||||| parent of d8e7e4b (Use opentelemetry_xray instead of otel_xray):src/otel_propagator_xray.app.src
-  otel_propagator_xray,
-========
-  opentelemetry_propagator_xray,
->>>>>>>> d8e7e4b (Use opentelemetry_xray instead of otel_xray):src/optentelemetry_propagator_xray.app.src
+  opentelemetry_xray,
   [
     {description, "OpenTelemetry propagator for AWS X-Ray"},
     {vsn, "0.1.0"},
