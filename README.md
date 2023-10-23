@@ -24,8 +24,16 @@ global TextMap Propagators must be configured.
 
 ## Configuration
 
+In `config/config.exs`:
+
+```elixir
+config :opentelemetry,
+  id_generator: :opentelemetry_xray_id_generator,
+  propagators: [:opentelemetry_xray_propagator, :baggage]
+```
+
 Since `trace_context` and `baggage` are the two default propagators the global
-TextMap Propagators must be configured if B3 is to be used for propagation:
+TextMap Propagators must be configured:
 
 ```erlang
 {text_map_propagators, [xray, baggage]},
