@@ -22,20 +22,28 @@
 % -behaviour(otel_id_generator).
 -export([generate_trace_id/0, generate_span_id/0]).
 
+-ifdef(TEST).
+
+-export([merge_trace_id/2]).
+
+-endif.
+
 -include_lib("opentelemetry_api/include/gradualizer.hrl").
 
-%% @doc Generates a 128 bit random integer to use as a trace id.
-
+% @doc Generates a 128 bit random integer to use as a trace id.
 -spec generate_trace_id() -> opentelemetry:trace_id().
 generate_trace_id() ->
   Timestamp = opentelemetry:convert_timestamp(opentelemetry:timestamp(), second),
-  %% 2 shifted left by 95 == 2 ^ 96
+  % 2 shifted left by 95 == 2 ^ 96
   UniqueId = rand:uniform(?assert_type(2 bsl 95 - 1, pos_integer())),
-  Timestamp bsl 96 band UniqueId.
+  merge_trace_id(Timestamp, UniqueId).
 
-%% @doc Generates a 64 bit random integer to use as a span id.
-
+% @doc Generates a 64 bit random integer to use as a span id.
 -spec generate_span_id() -> opentelemetry:span_id().
-generate_span_id() -> rand:uniform(?assert_type(2 bsl 63 - 1, pos_integer())).
+generate_span_id() ->
+    % 2 shifted left by 63 == 2 ^ 64
+    rand:uniform(?assert_type(2 bsl 63 - 1, pos_integer())).
 
-%% 2 shifted left by 63 == 2 ^ 64
+-spec merge_trace_id(non_neg_integer(), non_neg_integer()) -> opentelemetry:trace_id().
+merge_trace_id(Timestamp, UniqueId) ->
+  (Timestamp bsl 96) bor UniqueId.
