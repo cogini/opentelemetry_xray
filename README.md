@@ -7,11 +7,25 @@
 
 This library includes two modules:
 
+* An id generator that creates X-Ray-compatible `trace_id` and `span_id`.
+  It implements the `otel_id_generator` protocol in the Erlang SDK.
+
 * A propagator that reads and writes AWS X-Ray trace context headers.
   It implements the `otel_propagator_text_map` protocol in the Erlang SDK.
 
-* An id generator that creates X-Ray-compatible trace_id and span_id.
-  It implements the `otel_id_generator` protocol in the Erlang SDK.
+It assumes that you are using the
+[AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
+a version of the OpenTelemetry Collector which has support for AWS services such as X-Ray.
+You can run it as a sidecar container in an ECS task or as a daemon on an EC2 instance.
+It accepts standard OpenTelemetry traces, converts them to X-Ray format, and sends them to AWS.
+
+In AWS X-Ray, the `trace_id` is a 128-bit value. The first 32 bits are a Unix
+`time_t` and the rest are a 96-bit random number. If you use the default
+trace_id, then X-Ray will reject your traces. This library generates ids that are compatible with X-Ray.
+
+If your app is running behind an AWS Application Load Balancer, then the ALB will pass a trace in the
+`X-Amzn-Trace-Id` header. This library includes a propagator which reads the trace id from this header
+and uses it to set spans for your app.
 
 Links:
 
@@ -32,36 +46,5 @@ config :opentelemetry,
   propagators: [:opentelemetry_xray_propagator, :baggage]
 ```
 
-Since `trace_context` and `baggage` are the two default propagators the global
-TextMap Propagators must be configured:
-
-```erlang
-{text_map_propagators, [xray, baggage]},
-```
-
-```erlang
-CompositePropagator = otel_propagator_text_map_composite:create([xray, baggage]),
-opentelemetry:set_text_map_propagator(CompositePropagator).
-```
-
-It is also possible to set a separate list of injectors or extractors. For
-example, if the service should extract X-Ray encoded context but you only want
-to inject context encoded with the W3C TraceContext format (maybe you have some
-services only supporting B3 that are making requests to your server but you
-have no reason to continue propagating in both formats when communicating to
-other services further down the stack). In that case you would instead set
-configuration like:
-
-```erlang
-{text_map_extractors, [xray, trace_context, baggage]},
-{text_map_injectors, [trace_context, baggage]},
-```
-
-Or using calls to `opentelemetry` at runtime:
-
-```erlang
-XrayCompositePropagator = otel_propagator_text_map_composite:create([xray, trace_context, baggage]),
-CompositePropagator = otel_propagator_text_map_composite:create([trace_context, baggage]),
-opentelemetry:set_text_map_extractor(XrayCompositePropagator),
-opentelemetry:set_text_map_injector(CompositePropagator).
-```
+See [phoenix_container_example](https://github.com/cogini/phoenix_container_example)
+for a complete Elixir Phoenix app that uses this library.
