@@ -2,7 +2,7 @@
   application,
   opentelemetry_xray,
   [
-    {description, "OpenTelemetry propagator for AWS X-Ray"},
+    {description, "OpenTelemetry support for AWS X-Ray"},
     {vsn, "0.1.0"},
     {registered, []},
     {applications, [kernel, stdlib, opentelemetry_api]},
