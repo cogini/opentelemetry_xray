@@ -1,7 +1,7 @@
 ![test workflow](https://github.com/reachfh/logger_formatter_json/actions/workflows/test.yml/badge.svg)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
-# opentelemetry_propagator_xray
+# opentelemetry_xray
 
 An OpenTelemetry propagator that reads and writes AWS X-Ray trace context headers.
 
