@@ -15,17 +15,20 @@ This library includes two modules:
 
 It assumes that you are using the
 [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
-a version of the OpenTelemetry Collector which has support for AWS services such as X-Ray.
-You can run it as a sidecar container in an ECS task or as a daemon on an EC2 instance.
-It accepts standard OpenTelemetry traces, converts them to X-Ray format, and sends them to AWS.
+a version of the OpenTelemetry Collector which has support for AWS services
+such as X-Ray. You can run it as a sidecar container in an ECS task or as a
+daemon on an EC2 instance. It accepts standard OpenTelemetry traces, converts
+them to X-Ray format, and sends them to AWS.
 
 In AWS X-Ray, the `trace_id` is a 128-bit value. The first 32 bits are a Unix
 `time_t` and the rest are a 96-bit random number. If you use the default
-trace_id, then X-Ray will reject your traces. This library generates ids that are compatible with X-Ray.
+`trace_id`, then X-Ray will reject your traces. This library generates ids that
+are compatible with X-Ray.
 
-If your app is running behind an AWS Application Load Balancer, then the ALB will pass a trace in the
-`X-Amzn-Trace-Id` header. This library includes a propagator which reads the trace id from this header
-and uses it to set spans for your app.
+If your app is running behind an AWS Application Load Balancer, then the ALB
+will pass a trace in the `X-Amzn-Trace-Id` header. This library includes a
+propagator which reads the trace id from this header and uses it to set spans
+for your app.
 
 Links:
 
