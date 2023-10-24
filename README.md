@@ -36,6 +36,7 @@ Links:
 * https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
 * https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
 * https://davelucia.com/blog/observing-elixir-with-lightstep
+* https://opentelemetry.io/docs/instrumentation/erlang/getting-started/
 
 Since `trace_context` and `baggage` are the two default propagators, the
 global TextMap Propagators must be configured.
