@@ -39,9 +39,31 @@ Links:
 * https://davelucia.com/blog/observing-elixir-with-lightstep
 * https://opentelemetry.io/docs/instrumentation/erlang/getting-started/
 
+## Installation
+
+Erlang:
+
+Add `opentelemetry_xray` to the list of dependencies in `rebar.config`:
+
+```erlang
+{deps, [opentelemetry_xray]}.
+```
+
+Elixir:
+
+Add `logger_formatter_json` to the list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:opentelemetry_xray, "~> 0.7"},
+  ]
+end
+```
+
 ## Configuration
 
-In `config/config.exs`:
+In `config/config.exs` or `config/prod.exs`, configure `opentelemetry` to use this library:
 
 ```elixir
 config :opentelemetry,
