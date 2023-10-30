@@ -15,10 +15,11 @@ This library includes two modules:
 
 It assumes that you are using the
 [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
-a version of the OpenTelemetry Collector which has support for AWS services
-such as X-Ray. You can run it as a sidecar container in an ECS task or as a
-daemon on an EC2 instance. It accepts standard OpenTelemetry traces, converts
-them to X-Ray format, and sends them to AWS.
+a version of the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)
+which has support for AWS services such as X-Ray. It accepts standard
+OpenTelemetry traces, converts them to X-Ray format, and sends them to AWS.
+You can run the collector as a sidecar container in an ECS task or as a daemon
+on an EC2 instance.
 
 In AWS X-Ray, the `trace_id` is a 128-bit value. The first 32 bits are a Unix
 `time_t` and the rest are a 96-bit random number. If you use the default
@@ -27,8 +28,8 @@ are compatible with X-Ray.
 
 If your app is running behind an AWS Application Load Balancer, then the ALB
 will pass a trace in the `X-Amzn-Trace-Id` header. This library includes a
-propagator which reads the trace id from this header and uses it to set spans
-for your app.
+propagator which reads the trace id from this header and uses it within your app.
+It can then pass the same trace id to downstream apps via the header.
 
 Links:
 
@@ -37,9 +38,6 @@ Links:
 * https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
 * https://davelucia.com/blog/observing-elixir-with-lightstep
 * https://opentelemetry.io/docs/instrumentation/erlang/getting-started/
-
-Since `trace_context` and `baggage` are the two default propagators, the
-global TextMap Propagators must be configured.
 
 ## Configuration
 
