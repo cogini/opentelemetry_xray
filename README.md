@@ -44,6 +44,7 @@ Links:
 
 * Propagators in general: https://opentelemetry.io/docs/specs/otel/context/api-propagators/
 * Erlang SDK propagation: https://opentelemetry.io/docs/instrumentation/erlang/propagation/
+* Erlang SDK id generator: https://github.com/open-telemetry/opentelemetry-erlang/blob/main/apps/opentelemetry/src/otel_id_generator.erl
 * X-Ray tracing header: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
 * X-Ray sampling: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-sampling
 * X-Ray configuration: https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
