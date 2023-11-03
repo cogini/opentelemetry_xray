@@ -26,18 +26,29 @@ In AWS X-Ray, the `trace_id` is a 128-bit value. The first 32 bits are a Unix
 `trace_id`, then X-Ray will reject your traces. This library generates ids that
 are compatible with X-Ray.
 
-If your app is running behind an AWS Application Load Balancer, then the ALB
-will pass a trace in the `X-Amzn-Trace-Id` header. This library includes a
-propagator which reads the trace id from this header and uses it within your app.
-It can then pass the same trace id to downstream apps via the header.
+When your app app is downstream from another app or the AWS load balancer, the
+upstream app creates the trace for the current request and sends it in the
+`X-Amzn-Trace-Id" HTTP header. The header includes the trace id and optional
+information about the parent span and sampling.
+
+This library includes a propagator which reads the trace id from this header
+and uses it within your app. It can then pass the same trace id to downstream
+apps via the header.
+
+NOTE: Amazon by default samples relatively few traces. If you want to ensure
+that your traces are sampled, make sure that you turn on sampling in your app.
+A common approach is to turn on sampling for all traces that have errors,
+and some percentage of normal traces.
 
 Links:
 
-* Propagator: https://opentelemetry.io/docs/specs/otel/context/api-propagators/
-* https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
-* https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
-* https://davelucia.com/blog/observing-elixir-with-lightstep
-* https://opentelemetry.io/docs/instrumentation/erlang/getting-started/
+* Propagators in general: https://opentelemetry.io/docs/specs/otel/context/api-propagators/
+* Erlang SDK propagation: https://opentelemetry.io/docs/instrumentation/erlang/propagation/
+* X-Ray tracing header: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-tracingheader
+* X-Ray sampling: https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html#xray-concepts-sampling
+* X-Ray configuration: https://aws-otel.github.io/docs/getting-started/x-ray#configuring-the-aws-x-ray-exporter
+* OpenTelemetry getting started: https://opentelemetry.io/docs/instrumentation/erlang/getting-started/
+* OpenTelemetry intro: https://davelucia.com/blog/observing-elixir-with-lightstep
 
 ## Installation
 
