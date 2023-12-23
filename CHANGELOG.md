@@ -16,8 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Updated docs
 
-## [0.7.1] - 2023-12-22
+## [0.7.1] - 2023-12-23
 ### Added
-- Added resource detector to set AWS CloudWatch Log Group
 - Added logger filter to format trace_id
 - Updated docs
