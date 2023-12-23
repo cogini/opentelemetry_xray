@@ -4,8 +4,10 @@
 %%
 %% The X-Ray trace_id is a 64-bit identifier which is unique within a single
 %% trace. The first 32 bits is the timestamp, the remaining 96 bits are random.
+%% OpenTelemetry trace_ids are integers, so we combine the time and the unique
+%% id into a single 128-bit value.
 %%
-%% It is serilized as three values separated by hyphens.
+%% It is represented in text as three values separated by hyphens.
 %% For example, the trace_id {1-5759e988-bd862e3fe1be46a994272793} includes three
 %% values: version number 1, the time of the original request in Unix epoch
 %% time in hex, and finally a 96-bit identifier for the trace which is globally unique.
