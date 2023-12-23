@@ -132,6 +132,7 @@ encode(_) ->
   ),
   ok.
 
+
 encode_id(_) ->
   TraceId = binary_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
   SpanId = binary_to_integer(<<"53995c3f42cd8ad8">>, 16),
@@ -139,11 +140,9 @@ encode_id(_) ->
     [<<"5759e988">>, "-", <<"bd862e3fe1be46a994272793">>],
     opentelemetry_xray_propagator:encode_trace_id(TraceId)
   ),
-  ?assertEqual(
-    "53995c3f42cd8ad8",
-    opentelemetry_xray_propagator:encode_span_id(SpanId)
-  ),
+  ?assertEqual("53995c3f42cd8ad8", opentelemetry_xray_propagator:encode_span_id(SpanId)),
   ok.
+
 
 fields(_) ->
   ?assertEqual([<<"X-Amzn-Trace-Id">>], opentelemetry_xray_propagator:fields(foo)),

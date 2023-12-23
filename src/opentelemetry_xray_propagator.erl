@@ -160,6 +160,7 @@ encode_trace_id(TraceId) when is_integer(TraceId) ->
   <<Time:8/binary, UniqueId:24/binary>> = TraceIdHex,
   [Time, "-", UniqueId].
 
+
 % @doc Encode span_id to string.
 -spec encode_span_id(non_neg_integer()) -> unicode:latin1_chardata().
 encode_span_id(0) -> "";

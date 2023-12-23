@@ -19,10 +19,10 @@ encode(_) ->
   ),
   ?assertMatch(
     #{meta := #{trace_id := <<"1-5759e988-bd862e3fe1be46a994272793@53995c3f42cd8ad8">>}},
-    opentelemetry_xray_logger_filter:trace_id(#{meta => #{trace_id => TraceId, span_id => SpanId}}, undefined)
+    opentelemetry_xray_logger_filter:trace_id(
+      #{meta => #{trace_id => TraceId, span_id => SpanId}},
+      undefined
+    )
   ),
-  ?assertMatch(
-    #{meta := #{}},
-    opentelemetry_xray_logger_filter:trace_id(#{meta => #{}}, undefined)
-  ),
+  ?assertMatch(#{meta := #{}}, opentelemetry_xray_logger_filter:trace_id(#{meta => #{}}, undefined)),
   ok.
