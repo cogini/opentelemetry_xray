@@ -5,7 +5,7 @@
 
 [OpenTelemetry](https://opentelemetry.io/) [AWS X-Ray](https://aws.amazon.com/xray/) support for Erlang/Elixir.
 
-This library includes two modules:
+This library includes the following modules:
 
 * An id generator that creates X-Ray-compatible `trace_id` and `span_id`.
   It implements the `otel_id_generator` protocol in the Erlang SDK.
@@ -16,9 +16,9 @@ This library includes two modules:
 It assumes that you are using the
 [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
 a version of the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)
-which has support for AWS services such as X-Ray. It accepts standard
-OpenTelemetry traces, converts them to X-Ray format, and sends them to AWS.
-You can run the collector as a sidecar container in an ECS task or as a daemon
+which has support for AWS services such as X-Ray. This collector accepts standard
+OpenTelemetry traces, converts them to X-Ray format, and sends them to AWS. You
+can run the collector as a sidecar container in an ECS task or as a daemon
 on an EC2 instance.
 
 In AWS X-Ray, the `trace_id` is a 128-bit value. The first 32 bits are a Unix
@@ -35,11 +35,10 @@ This library includes a propagator which reads the trace id from this header
 and uses it within your app. It can then pass the same trace id to downstream
 apps via the header.
 
-NOTE: Amazon by default samples relatively few traces. If you want to ensure
+NOTE: By default Amazon samples relatively few traces. If you want to ensure
 that your traces are sampled, make sure that you turn on sampling in your app.
 A common approach is to turn on sampling for all traces that have errors,
 and some percentage of normal traces.
-
 
 Links:
 
@@ -79,25 +78,6 @@ end
 
 ## Configuration
 
-Elixir:
-
-In `config/config.exs` or `config/prod.exs`, configure `opentelemetry` to use this library:
-
-```elixir
-config :opentelemetry,
-  id_generator: :opentelemetry_xray_id_generator,
-  propagators: [:opentelemetry_xray_propagator, :baggage]
-```
-
-Add resource attributes to the span to connect it to log messages:
-
-```shell
-OTEL_RESOURCE_ATTRIBUTES="aws.log.group.names=$AWS_LOG_GROUP"
-```
-
-See [phoenix_container_example](https://github.com/cogini/phoenix_container_example)
-for a complete Elixir Phoenix app that uses this library.
-
 Erlang:
 
 In `sys.config`:
@@ -108,3 +88,22 @@ In `sys.config`:
     propagators: [opentelemetry_xray_propagator, baggage]
 }}
 ```
+
+Elixir:
+
+In `config/prod.exs`, configure `opentelemetry` to use this library:
+
+```elixir
+config :opentelemetry,
+  id_generator: :opentelemetry_xray_id_generator,
+  propagators: [:opentelemetry_xray_propagator, :baggage]
+```
+
+Add resource attributes to the span to connect it to log messages:
+
+```shell
+export OTEL_RESOURCE_ATTRIBUTES="aws.log.group.names=$AWS_LOG_GROUP"
+```
+
+See [phoenix_container_example](https://github.com/cogini/phoenix_container_example)
+for a complete Elixir Phoenix app that uses this library.
