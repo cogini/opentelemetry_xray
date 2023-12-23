@@ -18,7 +18,7 @@
 
 -module(opentelemetry_xray_id_generator).
 
-% Don't implement behavior to avoid dependency on opentelemetry
+% Don't specify behavior to avoid dependency on opentelemetry
 % -behaviour(otel_id_generator).
 -export([generate_trace_id/0, generate_span_id/0]).
 
