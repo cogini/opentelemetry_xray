@@ -4,7 +4,7 @@
 %%
 %% This module implements the otel_resource_detector behaviour. It reads the
 %% environment variable `AWS_LOG_GROUP` and creates a resource in the span
-%% which correlates traces and log messages. information about the log group. 
+%% which correlates traces and log messages.
 %%
 %% See:
 %% * https://github.com/aws/aws-xray-sdk-python/issues/188
