@@ -149,7 +149,7 @@ encode(SpanCtx) ->
 
 
 % @doc Encode trace_id to string.
--spec encode_trace_id(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
+-spec encode_trace_id(opentelemetry:span_ctx() | non_neg_integer()) -> unicode:latin1_chardata().
 encode_trace_id(#span_ctx{trace_id = TraceId}) ->
   TraceIdHex = unicode:characters_to_binary(io_lib:format("~32.16.0b", [TraceId])),
   <<Time:8/binary, UniqueId:24/binary>> = TraceIdHex,
