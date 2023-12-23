@@ -7,7 +7,7 @@
 -include_lib("opentelemetry_api/include/opentelemetry.hrl").
 
 % all() -> [decode, encode, fields].
-all() -> [fields, parse, decode, decode_invalid, encode].
+all() -> [fields, parse, decode, decode_invalid, encode, encode_id].
 
 parse() -> [{docs, "low level parsing"}].
 
@@ -132,6 +132,18 @@ encode(_) ->
   ),
   ok.
 
+encode_id(_) ->
+  TraceId = binary_to_integer(<<"5759e988bd862e3fe1be46a994272793">>, 16),
+  SpanId = binary_to_integer(<<"53995c3f42cd8ad8">>, 16),
+  ?assertEqual(
+    [<<"5759e988">>, "-", <<"bd862e3fe1be46a994272793">>],
+    opentelemetry_xray_propagator:encode_trace_id(TraceId)
+  ),
+  ?assertEqual(
+    "53995c3f42cd8ad8",
+    opentelemetry_xray_propagator:encode_span_id(SpanId)
+  ),
+  ok.
 
 fields(_) ->
   ?assertEqual([<<"X-Amzn-Trace-Id">>], opentelemetry_xray_propagator:fields(foo)),

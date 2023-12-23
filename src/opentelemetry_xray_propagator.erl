@@ -22,6 +22,9 @@
 
 -export([fields/1, inject/4, extract/5]).
 
+% Used by opentelemetry_xray_logger_filter.erl
+-export([encode_span_id/1, encode_trace_id/1]).
+
 -ifdef(TEST).
 
 -export([decode/1, decode/2, parse_trace_id/2, encode/1]).
@@ -145,12 +148,22 @@ encode(SpanCtx) ->
   otel_utils:assert_to_binary(["Root=1-", TraceId, Parent, Sampled]).
 
 
+% @doc Encode trace_id to string.
 -spec encode_trace_id(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
 encode_trace_id(#span_ctx{trace_id = TraceId}) ->
   TraceIdHex = unicode:characters_to_binary(io_lib:format("~32.16.0b", [TraceId])),
   <<Time:8/binary, UniqueId:24/binary>> = TraceIdHex,
+  [Time, "-", UniqueId];
+
+encode_trace_id(TraceId) when is_integer(TraceId) ->
+  TraceIdHex = unicode:characters_to_binary(io_lib:format("~32.16.0b", [TraceId])),
+  <<Time:8/binary, UniqueId:24/binary>> = TraceIdHex,
   [Time, "-", UniqueId].
 
+% @doc Encode span_id to string.
+-spec encode_span_id(non_neg_integer()) -> unicode:latin1_chardata().
+encode_span_id(0) -> "";
+encode_span_id(SpanId) -> io_lib:format("~16.16.0b", [SpanId]).
 
 -spec encode_parent(opentelemetry:span_ctx()) -> unicode:latin1_chardata().
 encode_parent(#span_ctx{span_id = 0}) -> "";
