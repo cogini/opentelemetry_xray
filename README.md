@@ -13,10 +13,6 @@ This library includes two modules:
 * A propagator that reads and writes AWS X-Ray trace context headers.
   It implements the `otel_propagator_text_map` protocol in the Erlang SDK.
 
-* A resource detector sets the AWS Log Group based on the environment variable
-  `AWS_LOG_GROUP`, allowing CloudWatch Logs to correlate log messages from the
-  app with traces.
-
 It assumes that you are using the
 [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
 a version of the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)
@@ -57,6 +53,7 @@ Links:
 * OpenTelemetry resources: https://opentelemetry.io/docs/instrumentation/erlang/resources/
 * OpenTelemetry getting started: https://opentelemetry.io/docs/instrumentation/erlang/getting-started/
 * OpenTelemetry intro: https://davelucia.com/blog/observing-elixir-with-lightstep
+* Addding Erlang logger filters to new Elixir logger: https://write.as/yuriploc/elixir-logger-and-erlang-filters
 
 ## Installation
 
@@ -70,7 +67,7 @@ Add `opentelemetry_xray` to the list of dependencies in `rebar.config`:
 
 Elixir:
 
-Add `logger_formatter_json` to the list of dependencies in `mix.exs`:
+Add `opentelemetry_xray` to the list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -82,18 +79,17 @@ end
 
 ## Configuration
 
-Elixir: 
+Elixir:
 
 In `config/config.exs` or `config/prod.exs`, configure `opentelemetry` to use this library:
 
 ```elixir
 config :opentelemetry,
   id_generator: :opentelemetry_xray_id_generator,
-  propagators: [:opentelemetry_xray_propagator, :baggage],
-  resource_detectors: [:opentelemetry_xray_resource, :otel_resource_env_var, :otel_resource_app_env]
+  propagators: [:opentelemetry_xray_propagator, :baggage]
 ```
 
-As an alternative to setting `resource_detectors`, you can set the value as an environment variable:
+Add resource attributes to the span to connect it to log messages:
 
 ```shell
 OTEL_RESOURCE_ATTRIBUTES="aws.log.group.names=$AWS_LOG_GROUP"
@@ -102,14 +98,13 @@ OTEL_RESOURCE_ATTRIBUTES="aws.log.group.names=$AWS_LOG_GROUP"
 See [phoenix_container_example](https://github.com/cogini/phoenix_container_example)
 for a complete Elixir Phoenix app that uses this library.
 
-Erlang
+Erlang:
 
 In `sys.config`:
 
 ```erlang
 {opentelemetry, {
     id_generator, [opentelemetry_xray_id_generator],
-    propagators: [opentelemetry_xray_propagator, baggage],
-    resource_detectors, [opentelemetry_xray_resource, otel_resource_env_var, otel_resource_app_env]
+    propagators: [opentelemetry_xray_propagator, baggage]
 }}
 ```
