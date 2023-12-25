@@ -2,12 +2,14 @@
 %%
 %% Erlang logger filter to format trace id in X-Ray format.
 %%
-%% This module implements a logger filter which formats the trace_id in X-Ray
-%% format so log messages can be correlated with traces.
+%% This module implements a logger filter which converts the otel_trace_id
+%% field into a new xray_trace_id field in X-Ray format so log messages can be
+%% correlated with traces.
 %%
 %% See:
 %% * https://www.erlang.org/doc/man/logger#type-filter
-%% * https://github.com/aws/aws-xray-sdk-python/issues/188
+%% * https://github.com/aws/aws-xray-sdk-python/issues/188#issuecomment-982022464
+%% * https://github.com/aws-observability/aws-otel-python/issues/46
 %% @end
 
 -module(opentelemetry_xray_logger_filter).
