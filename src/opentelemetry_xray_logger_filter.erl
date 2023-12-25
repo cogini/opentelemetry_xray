@@ -18,19 +18,41 @@
 
 -spec trace_id(LogEvent, Extra) ->
   logger:filter_return() when LogEvent :: logger:log_event(), Extra :: term().
-trace_id(#{meta := #{trace_id := TraceId, span_id := SpanId} = Meta} = LogEvent, _Extra)
+trace_id(#{meta := #{otel_trace_id := TraceId, otel_span_id := SpanId} = Meta} = LogEvent, _Extra)
 when is_integer(TraceId), is_integer(SpanId) ->
   EncodedTraceId = opentelemetry_xray_propagator:encode_trace_id(TraceId),
   EncodedSpanId = opentelemetry_xray_propagator:encode_span_id(SpanId),
   NewId = otel_utils:assert_to_binary(["1-", EncodedTraceId, "@", EncodedSpanId]),
-  NewMeta0 = maps:update(trace_id, NewId, Meta),
-  NewMeta1 = maps:remove(span_id, NewMeta0),
-  maps:update(meta, NewMeta1, LogEvent);
+  NewMeta = maps:put(xray_trace_id, NewId, Meta),
+  maps:update(meta, NewMeta, LogEvent);
 
-trace_id(#{meta := #{trace_id := TraceId} = Meta} = LogEvent, _Extra) when is_integer(TraceId) ->
+trace_id(#{meta := #{otel_trace_id := TraceId} = Meta} = LogEvent, _Extra) when is_integer(TraceId) ->
   EncodedTraceId = opentelemetry_xray_propagator:encode_trace_id(TraceId),
   NewId = otel_utils:assert_to_binary(["1-", EncodedTraceId]),
-  NewMeta = maps:update(trace_id, NewId, Meta),
+  NewMeta = maps:put(xray_trace_id, NewId, Meta),
+  maps:update(meta, NewMeta, LogEvent);
+
+trace_id(
+  #{
+    meta
+    :=
+    #{otel_trace_id := <<Time:8/binary, TraceId/binary>> = HexTraceId, otel_span_id := HexSpanId} =
+      Meta
+  } = LogEvent,
+  _Extra
+)
+when is_binary(HexTraceId), is_binary(HexSpanId) ->
+  NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId, "@", HexSpanId]),
+  NewMeta = maps:put(xray_trace_id, NewId, Meta),
+  maps:update(meta, NewMeta, LogEvent);
+
+trace_id(
+  #{meta := #{otel_trace_id := <<Time:8/binary, TraceId/binary>> = HexTraceId} = Meta} = LogEvent,
+  _Extra
+)
+when is_binary(HexTraceId) ->
+  NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId]),
+  NewMeta = maps:put(xray_trace_id, NewId, Meta),
   maps:update(meta, NewMeta, LogEvent);
 
 trace_id(LogEvent, _Extra) -> LogEvent.
