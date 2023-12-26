@@ -42,8 +42,7 @@ trace_id(
       Meta
   } = LogEvent,
   _Extra
-)
-when is_binary(HexTraceId), is_binary(HexSpanId) ->
+) ->
   NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId, "@", HexSpanId]),
   NewMeta = maps:put(xray_trace_id, NewId, Meta),
   maps:update(meta, NewMeta, LogEvent);
@@ -51,8 +50,7 @@ when is_binary(HexTraceId), is_binary(HexSpanId) ->
 trace_id(
   #{meta := #{otel_trace_id := <<Time:8/binary, TraceId/binary>> = HexTraceId} = Meta} = LogEvent,
   _Extra
-)
-when is_binary(HexTraceId) ->
+) ->
   NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId]),
   NewMeta = maps:put(xray_trace_id, NewId, Meta),
   maps:update(meta, NewMeta, LogEvent);
