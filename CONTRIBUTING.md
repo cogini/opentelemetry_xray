@@ -21,7 +21,7 @@ rebar3 steamroll
 Generate docs:
 
 ```console
-rebar3 ex_docs
+rebar3 ex_doc
 ```
 
 Publish:
