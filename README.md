@@ -5,16 +5,7 @@
 
 [OpenTelemetry](https://opentelemetry.io/) [AWS X-Ray](https://aws.amazon.com/xray/) support for Erlang/Elixir.
 
-This library includes the following modules:
-
-* An id generator that creates X-Ray-compatible `trace_id` and `span_id`.
-  It implements the `otel_id_generator` protocol in the Erlang SDK.
-
-* A propagator that reads and writes AWS X-Ray trace context headers.
-  It implements the `otel_propagator_text_map` protocol in the Erlang SDK.
-
-It assumes that you are using the
-[AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
+It works with the [AWS Distro for OpenTelemetry Collector](https://aws-otel.github.io/docs/getting-started/collector),
 a version of the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/)
 which has support for AWS services such as X-Ray. This collector accepts standard
 OpenTelemetry traces, converts them to X-Ray format, and sends them to AWS. You
@@ -28,7 +19,7 @@ are compatible with X-Ray.
 
 When your app app is downstream from another app or the AWS load balancer, the
 upstream app creates the trace for the current request and sends it in the
-`X-Amzn-Trace-Id" HTTP header. The header includes the trace id and optional
+`X-Amzn-Trace-Id` HTTP header. The header includes the trace id and optional
 information about the parent span and sampling.
 
 This library includes a propagator which reads the trace id from this header
@@ -37,8 +28,16 @@ apps via the header.
 
 NOTE: By default Amazon samples relatively few traces. If you want to ensure
 that your traces are sampled, make sure that you turn on sampling in your app.
-A common approach is to turn on sampling for all traces that have errors,
-and some percentage of normal traces.
+A common approach is to turn on sampling for all traces that have errors
+and for some percentage of normal traces.
+
+This library includes the following modules:
+
+* An id generator that creates X-Ray-compatible `trace_id` and `span_id`.
+  It implements the `otel_id_generator` protocol in the Erlang SDK.
+
+* A propagator that reads and writes AWS X-Ray trace context headers.
+  It implements the `otel_propagator_text_map` protocol in the Erlang SDK.
 
 Links:
 
