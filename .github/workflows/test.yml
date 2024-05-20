@@ -24,14 +24,13 @@ jobs:
       - name: Install Erlang and Elixir
         uses: erlef/setup-beam@v1
         with:
-          otp-version: ${{matrix.otp}}
+          otp-version: ${{ matrix.otp }}
           rebar3-version: '3.18.0'
 
       - name: Retrieve cached deps
         uses: actions/cache@v3
         with:
-          path: |
-            _build
+          path: _build
           key: ${{ matrix.otp }}-${{ hashFiles('**/rebar.lock') }}
           restore-keys: |
             ${{ matrix.otp }}-
