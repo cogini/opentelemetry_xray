@@ -6,21 +6,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.0] - 2023-10-23
 ### Added
-- Initial version
+- Create initial version
 
 ## [0.1.1] - 2023-10-23
 ### Added
-- Updated docs
+- Update docs
 
 ## [0.7.0] - 2023-10-30
 ### Added
-- Updated docs
+- Update docs
 
 ## [0.7.1] - 2023-12-23
 ### Added
-- Added logger filter to format trace_id
-- Updated docs
+- Add logger filter to format trace_id
+- Update docs
 
 ## [0.7.2] - 2024-05-20
 ### Added
 - Upgrade opentelemetry_api
+
+## [0.7.3] - 2024-05-20
+### Added
+- Updated docs
