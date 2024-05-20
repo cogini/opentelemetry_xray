@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        otp: ['24.3', '25.2', '26.1.2']
+        otp: ['24.3', '25.2', '26.2.5']
     steps:
 
       - name: Check out source
