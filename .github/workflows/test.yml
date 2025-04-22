@@ -25,7 +25,7 @@ jobs:
         with:
           otp-version: ${{ matrix.otp }}
           # Could be 'latest'
-          rebar3-version: '3.24.0'
+          rebar3-version: '3.18.0'
 
       - name: Retrieve cached deps
         uses: actions/cache@v4
