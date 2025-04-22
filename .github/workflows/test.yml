@@ -16,19 +16,13 @@ jobs:
       fail-fast: false
       matrix:
         otp: ['24', '25', '26', '27']
-        rebar: ['3.18.0', 'latest']
+        rebar: ['latest']
         include:
           - otp: '24'
             rebar: '3.18.0'
-          - otp: '25'
-            rebar: 'latest'
-          - otp: '26'
-            rebar: 'latest'
-          - otp: '27'
-            rebar: 'latest'
         exclude:
-          - otp: '27'
-            rebar: '3.18.0'
+          - otp: '24'
+            rebar: 'latest'
     steps:
       - name: Check out source
         uses: actions/checkout@v4
