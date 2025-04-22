@@ -18,53 +18,52 @@
 
 -export([trace_id/2]).
 
--spec trace_id(LogEvent, Extra) ->
-  logger:filter_return() when LogEvent :: logger:log_event(), Extra :: term().
-trace_id(#{meta := #{otel_trace_id := TraceId, otel_span_id := SpanId} = Meta} = LogEvent, _Extra)
-when is_integer(TraceId), is_integer(SpanId) ->
-  EncodedTraceId = opentelemetry_xray_propagator:encode_trace_id(TraceId),
-  EncodedSpanId = opentelemetry_xray_propagator:encode_span_id(SpanId),
-  NewId = otel_utils:assert_to_binary(["1-", EncodedTraceId, "@", EncodedSpanId]),
-  NewMeta = maps:put(xray_trace_id, NewId, Meta),
-  maps:update(meta, NewMeta, LogEvent);
-
-trace_id(#{meta := #{otel_trace_id := TraceId} = Meta} = LogEvent, _Extra) when is_integer(TraceId) ->
-  EncodedTraceId = opentelemetry_xray_propagator:encode_trace_id(TraceId),
-  NewId = otel_utils:assert_to_binary(["1-", EncodedTraceId]),
-  NewMeta = maps:put(xray_trace_id, NewId, Meta),
-  maps:update(meta, NewMeta, LogEvent);
-
-trace_id(
-  #{meta := #{otel_trace_id := HexTraceId, otel_span_id := HexSpanId} = Meta} = LogEvent,
-  _Extra
-)
-when is_list(HexTraceId), is_list(HexSpanId) ->
-  Time = string:slice(HexTraceId, 0, 8),
-  TraceId = string:slice(HexTraceId, 9),
-  NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId, "@", HexSpanId]),
-  NewMeta = maps:put(xray_trace_id, NewId, Meta),
-  maps:update(meta, NewMeta, LogEvent);
-
+-spec trace_id(LogEvent, Extra) -> logger:filter_return()
+    when LogEvent :: logger:log_event(),
+         Extra :: term().
+trace_id(#{meta := #{otel_trace_id := TraceId, otel_span_id := SpanId} = Meta} = LogEvent,
+         _Extra)
+    when is_integer(TraceId), is_integer(SpanId) ->
+    EncodedTraceId = opentelemetry_xray_propagator:encode_trace_id(TraceId),
+    EncodedSpanId = opentelemetry_xray_propagator:encode_span_id(SpanId),
+    NewId = otel_utils:assert_to_binary(["1-", EncodedTraceId, "@", EncodedSpanId]),
+    NewMeta = maps:put(xray_trace_id, NewId, Meta),
+    maps:update(meta, NewMeta, LogEvent);
+trace_id(#{meta := #{otel_trace_id := TraceId} = Meta} = LogEvent, _Extra)
+    when is_integer(TraceId) ->
+    EncodedTraceId = opentelemetry_xray_propagator:encode_trace_id(TraceId),
+    NewId = otel_utils:assert_to_binary(["1-", EncodedTraceId]),
+    NewMeta = maps:put(xray_trace_id, NewId, Meta),
+    maps:update(meta, NewMeta, LogEvent);
+trace_id(#{meta := #{otel_trace_id := HexTraceId, otel_span_id := HexSpanId} = Meta} =
+             LogEvent,
+         _Extra)
+    when is_list(HexTraceId), is_list(HexSpanId) ->
+    Time = string:slice(HexTraceId, 0, 8),
+    TraceId = string:slice(HexTraceId, 9),
+    NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId, "@", HexSpanId]),
+    NewMeta = maps:put(xray_trace_id, NewId, Meta),
+    maps:update(meta, NewMeta, LogEvent);
 trace_id(#{meta := #{otel_trace_id := HexTraceId} = Meta} = LogEvent, _Extra)
-when is_list(HexTraceId) ->
-  Time = string:slice(HexTraceId, 0, 8),
-  TraceId = string:slice(HexTraceId, 9),
-  NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId]),
-  NewMeta = maps:put(xray_trace_id, NewId, Meta),
-  maps:update(meta, NewMeta, LogEvent);
-
-trace_id(
-  #{meta := #{otel_trace_id := <<Time:8/binary, TraceId/binary>>, otel_span_id := HexSpanId} = Meta} =
-    LogEvent,
-  _Extra
-) ->
-  NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId, "@", HexSpanId]),
-  NewMeta = maps:put(xray_trace_id, NewId, Meta),
-  maps:update(meta, NewMeta, LogEvent);
-
-trace_id(#{meta := #{otel_trace_id := <<Time:8/binary, TraceId/binary>>} = Meta} = LogEvent, _Extra) ->
-  NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId]),
-  NewMeta = maps:put(xray_trace_id, NewId, Meta),
-  maps:update(meta, NewMeta, LogEvent);
-
-trace_id(LogEvent, _Extra) -> LogEvent.
+    when is_list(HexTraceId) ->
+    Time = string:slice(HexTraceId, 0, 8),
+    TraceId = string:slice(HexTraceId, 9),
+    NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId]),
+    NewMeta = maps:put(xray_trace_id, NewId, Meta),
+    maps:update(meta, NewMeta, LogEvent);
+trace_id(#{meta :=
+               #{otel_trace_id := <<Time:8/binary, TraceId/binary>>, otel_span_id := HexSpanId} =
+                   Meta} =
+             LogEvent,
+         _Extra) ->
+    NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId, "@", HexSpanId]),
+    NewMeta = maps:put(xray_trace_id, NewId, Meta),
+    maps:update(meta, NewMeta, LogEvent);
+trace_id(#{meta := #{otel_trace_id := <<Time:8/binary, TraceId/binary>>} = Meta} =
+             LogEvent,
+         _Extra) ->
+    NewId = otel_utils:assert_to_binary(["1-", Time, "-", TraceId]),
+    NewMeta = maps:put(xray_trace_id, NewId, Meta),
+    maps:update(meta, NewMeta, LogEvent);
+trace_id(LogEvent, _Extra) ->
+    LogEvent.

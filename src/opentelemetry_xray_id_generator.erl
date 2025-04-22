@@ -34,18 +34,19 @@
 % @doc Generate 128-bit random integer to use as trace id.
 -spec generate_trace_id() -> opentelemetry:trace_id().
 generate_trace_id() ->
-  Timestamp = opentelemetry:convert_timestamp(opentelemetry:timestamp(), second),
-  % 2 shifted left by 95 == 2 ^ 96
-  UniqueId = rand:uniform(?assert_type(2 bsl 95 - 1, pos_integer())),
-  merge_trace_id(Timestamp, UniqueId).
-
+    Timestamp =
+        opentelemetry:convert_timestamp(
+            opentelemetry:timestamp(), second),
+    % 2 shifted left by 95 == 2 ^ 96
+    UniqueId = rand:uniform(?assert_type(2 bsl 95 - 1, pos_integer())),
+    merge_trace_id(Timestamp, UniqueId).
 
 % @doc Generate 64-bit random integer to use as a span id.
 -spec generate_span_id() -> opentelemetry:span_id().
 generate_span_id() ->
-  % 2 shifted left by 63 == 2 ^ 64
-  rand:uniform(?assert_type(2 bsl 63 - 1, pos_integer())).
-
+    % 2 shifted left by 63 == 2 ^ 64
+    rand:uniform(?assert_type(2 bsl 63 - 1, pos_integer())).
 
 -spec merge_trace_id(non_neg_integer(), non_neg_integer()) -> opentelemetry:trace_id().
-merge_trace_id(Timestamp, UniqueId) -> (Timestamp bsl 96) bor UniqueId.
+merge_trace_id(Timestamp, UniqueId) ->
+    Timestamp bsl 96 bor UniqueId.
