@@ -1,13 +1,8 @@
 {"1.2.0",
-[{<<"opentelemetry_api">>,{pkg,<<"opentelemetry_api">>,<<"1.3.0">>},0},
- {<<"opentelemetry_semantic_conventions">>,
-  {pkg,<<"opentelemetry_semantic_conventions">>,<<"0.2.0">>},
-  1}]}.
+[{<<"opentelemetry_api">>,{pkg,<<"opentelemetry_api">>,<<"1.4.0">>},0}]}.
 [
 {pkg_hash,[
- {<<"opentelemetry_api">>, <<"03E2177F28DD8D11AAA88E8522C81C2F6A788170FE52F7A65262340961E663F9">>},
- {<<"opentelemetry_semantic_conventions">>, <<"B67FE459C2938FCAB341CB0951C44860C62347C005ACE1B50F8402576F241435">>}]},
+ {<<"opentelemetry_api">>, <<"63CA1742F92F00059298F478048DFB826F4B20D49534493D6919A0DB39B6DB04">>}]},
 {pkg_hash_ext,[
- {<<"opentelemetry_api">>, <<"B9E5FF775FD064FA098DBA3C398490B77649A352B40B0B730A6B7DC0BDD68858">>},
- {<<"opentelemetry_semantic_conventions">>, <<"D61FA1F5639EE8668D74B527E6806E0503EFC55A42DB7B5F39939D84C07D6895">>}]}
+ {<<"opentelemetry_api">>, <<"3DFBBFAA2C2ED3121C5C483162836C4F9027DEF469C41578AF5EF32589FCFC58">>}]}
 ].
