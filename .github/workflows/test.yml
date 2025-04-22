@@ -34,6 +34,11 @@ jobs:
           key: ${{ matrix.otp }}-${{ hashFiles('**/rebar.lock') }}
           restore-keys: ${{ matrix.otp }}-
 
+      # Force full recompile on builds that are retried
+      - name: Clean deps to avoid flaky incremental builds
+        if: github.run_attempt != '1'
+        run: rm -rf _build
+
       - name: Check formatting
         run: rebar3 steamroll --check
 
