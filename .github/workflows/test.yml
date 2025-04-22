@@ -24,7 +24,8 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ matrix.otp }}
-          rebar3-version: '3.18.0'
+          # Could be 'latest'
+          rebar3-version: '3.24.0'
 
       - name: Retrieve cached deps
         uses: actions/cache@v4
