@@ -1,4 +1,9 @@
-![test workflow](https://github.com/reachfh/logger_formatter_json/actions/workflows/test.yml/badge.svg)
+![test workflow](https://github.com/cogini/opentelemetry_xray/actions/workflows/test.yml/badge.svg)
+[![Module Version](https://img.shields.io/hexpm/v/opentelemetry_xray.svg)](https://hex.pm/packages/opentelemetry_xray)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/opentelemetry_xray)
+[![Total Download](https://img.shields.io/hexpm/dt/opentelemetry_xray.svg)](https://hex.pm/packages/opentelemetry_xray)
+[![License](https://img.shields.io/hexpm/l/opentelemetry_xray.svg)](https://github.com/cogini/opentelemetry_xray/blob/master/LICENSE.md)
+[![Last Updated](https://img.shields.io/github/last-commit/cogini/opentelemetry_xray/main)](https://github.com/cogini/opentelemetry_xray/commits/main)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 
 # opentelemetry_xray
