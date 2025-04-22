@@ -17,7 +17,6 @@ jobs:
       matrix:
         otp: ['24', '25', '26', '27']
     steps:
-
       - name: Check out source
         uses: actions/checkout@v4
 
@@ -32,8 +31,7 @@ jobs:
         with:
           path: _build
           key: ${{ matrix.otp }}-${{ hashFiles('**/rebar.lock') }}
-          restore-keys: |
-            ${{ matrix.otp }}-
+          restore-keys: ${{ matrix.otp }}-
 
       - name: Check formatting
         run: rebar3 steamroll --check
