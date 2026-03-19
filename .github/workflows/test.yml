@@ -20,6 +20,8 @@ jobs:
         include:
           - otp: '24'
             rebar: '3.18.0'
+          - otp: '25'
+            rebar: '3.18.0'
         exclude:
           - otp: '24'
             rebar: 'latest'
