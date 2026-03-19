@@ -25,6 +25,8 @@ jobs:
         exclude:
           - otp: '24'
             rebar: 'latest'
+          - otp: '25'
+            rebar: 'latest'
     steps:
       - name: Check out source
         uses: actions/checkout@v4
